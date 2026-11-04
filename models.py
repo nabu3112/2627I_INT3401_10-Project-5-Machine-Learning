@@ -42,6 +42,7 @@ class PerceptronModel(Module):
         super(PerceptronModel, self).__init__()
 
         "*** YOUR CODE HERE ***"
+        self.w = Parameter(ones(1, dimensions))
 
 
     def get_weights(self):
@@ -49,6 +50,7 @@ class PerceptronModel(Module):
         Return a Parameter instance with the current weights of the perceptron.
         """
         return self.w
+
 
     def forward(self, x):
         """
@@ -61,6 +63,7 @@ class PerceptronModel(Module):
         The pytorch function `tensordot` may be helpful here.
         """
         "*** YOUR CODE HERE ***"
+        return matmul(x, self.w.t())
 
         
 
@@ -72,7 +75,11 @@ class PerceptronModel(Module):
         """
         score = self(x)
 
-        "*** YOUR CODE HERE ***"
+        if score >= 0:
+            return 1
+        else:
+            return -1
+        
 
 
 
@@ -99,6 +106,7 @@ class RegressionModel(Module):
             A node with shape (batch_size x 1) containing predicted y-values
         """
         "*** YOUR CODE HERE ***"
+
 
 
 class DigitClassificationModel(Module):
