@@ -83,29 +83,27 @@ class PerceptronModel(Module):
 
 
 
+
 class RegressionModel(Module):
     """
-    A neural network model for approximating a function that maps from real
-    numbers to real numbers. The network should be sufficiently large to be able
-    to approximate sin(x) on the interval [-2pi, 2pi] to reasonable precision.
+    Neural network for approximating sin(x)
+    on the interval [-2pi, 2pi].
     """
 
     def __init__(self):
-        # Initialize your model parameters here
-        "*** YOUR CODE HERE ***"
         super().__init__()
-   
+
+        self.layer1 = Linear(1, 128)
+        self.layer2 = Linear(128, 128)
+        self.layer3 = Linear(128, 1)
 
     def forward(self, x):
-        """
-        Runs the model for a batch of examples.
+        x = relu(self.layer1(x))
+        x = relu(self.layer2(x))
+        x = self.layer3(x)
 
-        Inputs:
-            x: a node with shape (batch_size x 1)
-        Returns:
-            A node with shape (batch_size x 1) containing predicted y-values
-        """
-        "*** YOUR CODE HERE ***"
+        return x
+  
 
 
 

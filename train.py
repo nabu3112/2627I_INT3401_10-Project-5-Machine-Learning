@@ -46,22 +46,67 @@ def train_perceptron(model, dataset):
                 break
 
 
+
 def train_regression(model, dataset):
     """
-    Trains the model.
-
-    In order to create batches, create a DataLoader object and pass in `dataset` as well as your required 
-    batch size. You can look at PerceptronModel as a guideline for how you should implement the DataLoader
-
-    Each sample in the dataloader object will be in the form {'x': features, 'label': label} where label
-    is the item we need to predict based off of its features.
-
-    Inputs:
-        model: Pytorch model to use
-        dataset: a PyTorch dataset object containing data to be trained on
-        
+    Train model to approximate sin(x).
     """
-    "*** YOUR CODE HERE ***"
+
+    dataloader = DataLoader(
+        dataset,
+        batch_size=50,
+        shuffle=True
+    )
+
+    
+    optimizer = optim.Adam(
+        model.parameters(),
+        lr=0.001
+    )
+
+
+    for epoch in range(2000):
+        model.train()
+
+        for batch in dataloader:
+            x = batch["x"]
+            y = batch["label"]
+
+            optimizer.zero_grad()
+            prediction = model(x)
+            loss = regression_loss(prediction, y)
+
+            loss.backward()
+
+            optimizer.step()
+
+        model.eval()
+
+        total_loss = 0.0
+        total_samples = 0
+
+        with no_grad():
+            for batch in dataloader:
+                x = batch["x"]
+                y = batch["label"]
+
+                prediction = model(x)
+                loss = regression_loss(prediction, y)
+
+                n = x.shape[0]
+                total_loss += loss.item() * n
+                total_samples += n
+
+        average_loss = total_loss / total_samples
+
+        if epoch % 100 == 0:
+            print(f"Epoch {epoch}: Loss = {average_loss:.6f}")
+
+      
+        if average_loss <= 0.015:
+            print("Training completed!")
+            break
+
 
 
 def train_digitclassifier(model, dataset):
