@@ -122,6 +122,7 @@ class DigitClassificationModel(Module):
         input_size = 28 * 28
         output_size = 10
         "*** YOUR CODE HERE ***"
+
         self.fc1 = Linear(input_size, 256)
         self.fc2 = Linear(256, 128)
         self.fc3 = Linear(128, output_size)
@@ -142,11 +143,9 @@ class DigitClassificationModel(Module):
                 (also called logits)
         """
         """ YOUR CODE HERE """
-
         x = relu(self.fc1(x))
         x = relu(self.fc2(x))
         return self.fc3(x)
-
 
 
 class LanguageIDModel(Module):
@@ -166,9 +165,10 @@ class LanguageIDModel(Module):
         self.num_chars = 47
         self.languages = ["English", "Spanish", "Finnish", "Dutch", "Polish"]
         super(LanguageIDModel, self).__init__()
-        "*** YOUR CODE HERE ***"
-        # Initialize your model parameters here
-
+        hidden_size = 200
+        self.char_proj = Linear(self.num_chars, hidden_size)
+        self.state_proj = Linear(hidden_size, hidden_size, bias=False)
+        self.classifier = Linear(hidden_size, len(self.languages))
 
 
     def forward(self, xs):
@@ -202,6 +202,12 @@ class LanguageIDModel(Module):
         """
         "*** YOUR CODE HERE ***"
 
+        h = relu(self.char_proj(xs[0]))
+        for x_t in xs[1:]:
+            proposed = relu(self.char_proj(x_t) + self.state_proj(h))
+            mask = x_t.sum(dim=1, keepdim=True)
+            h = mask * proposed + (1 - mask) * h
+        return self.classifier(h)
 
 
 def Convolve(input: tensor, weight: tensor):
