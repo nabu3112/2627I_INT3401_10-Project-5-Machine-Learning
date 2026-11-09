@@ -236,6 +236,40 @@ def Convolve(input: tensor, weight: tensor):
     weight_dimensions = weight.shape
     Output_Tensor = tensor(())
     "*** YOUR CODE HERE ***"
+        # Lấy kích thước của ảnh đầu vào
+    input_height = input.shape[0]  # Số hàng của ảnh
+    input_width = input.shape[1]   # Số cột của ảnh
+
+    # Lấy kích thước của bộ lọc (kernel)
+    weight_height = weight.shape[0]  # Số hàng của bộ lọc
+    weight_width = weight.shape[1]   # Số cột của bộ lọc
+
+    # Tính kích thước ảnh đầu ra
+    # Không padding nên kích thước sẽ nhỏ hơn ảnh ban đầu
+    output_height = input_height - weight_height + 1
+    output_width = input_width - weight_width + 1
+
+    # Tạo Tensor chứa kết quả, ban đầu toàn số 0
+    Output_Tensor = zeros((output_height, output_width))
+
+    # Cho bộ lọc trượt theo từng hàng của ảnh
+    for y in range(output_height):
+
+        # Cho bộ lọc trượt theo từng cột của ảnh
+        for x in range(output_width):
+
+            # Cắt một vùng ảnh có kích thước bằng bộ lọc
+            input_region = input[
+                y:y + weight_height,
+                x:x + weight_width
+            ]
+
+            # Nhân từng phần tử của vùng ảnh với bộ lọc
+            # Sau đó cộng tất cả kết quả lại thành một số
+            value = tensordot(input_region, weight, dims=2)
+
+            # Ghi kết quả vào vị trí tương ứng của ảnh đầu ra
+            Output_Tensor[y, x] = value
 
     "*** End Code ***"
     return Output_Tensor
@@ -260,6 +294,18 @@ class DigitConvolutionalModel(Module):
 
         self.convolution_weights = Parameter(ones((3, 3)))
         """ YOUR CODE HERE """
+        # Tạo lớp Linear thứ nhất
+        # 26*26 = 676 là số phần tử sau convolution và flatten
+        # 128 là số neuron của lớp ẩn
+        self.layer1 = Linear(676, 128)
+
+        # Tạo lớp Linear thứ hai
+        # Nhận 128 giá trị và tạo ra 64 giá trị
+        self.layer2 = Linear(128, 64)
+
+        # Lớp đầu ra có 10 neuron tương ứng với 10 chữ số 0-9
+        self.output_layer = Linear(64, output_size)
+
 
 
     def forward(self, x):
@@ -273,6 +319,21 @@ class DigitConvolutionalModel(Module):
         )
         x = x.flatten(start_dim=1)
         """ YOUR CODE HERE """
+        # Đưa dữ liệu qua lớp Linear thứ nhất
+        # ReLU giúp mô hình học được các quan hệ phi tuyến
+        x = relu(self.layer1(x))
+
+        # Đưa kết quả qua lớp Linear thứ hai
+        # Tiếp tục sử dụng ReLU
+        x = relu(self.layer2(x))
+
+        # Tính điểm dự đoán cho 10 chữ số
+        # Không dùng ReLU ở lớp cuối
+        x = self.output_layer(x)
+
+        # Trả về kết quả dự đoán
+        return x
+
 
 
 class Attention(Module):

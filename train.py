@@ -168,3 +168,45 @@ def Train_DigitConvolution(model, dataset):
     Trains the model.
     """
     """ YOUR CODE HERE """
+    # Đưa mô hình vào chế độ training
+    model.train()
+
+    # Chia dữ liệu thành từng batch, mỗi batch 64 ảnh
+    dataloader = DataLoader(
+        dataset,
+        batch_size=64,
+        shuffle=True
+    )
+
+    # Tạo Adam optimizer để cập nhật trọng số
+    optimizer = optim.Adam(
+        model.parameters(),
+        lr=0.001
+    )
+
+    # Huấn luyện qua toàn bộ dữ liệu 10 lần
+    for epoch in range(10):
+
+        # Lấy lần lượt từng batch dữ liệu
+        for batch in dataloader:
+
+            # Lấy ảnh đầu vào
+            x = batch['x']
+
+            # Lấy nhãn đúng dạng one-hot
+            y = batch['label']
+
+            # Xóa gradient từ lần học trước
+            optimizer.zero_grad()
+
+            # Đưa ảnh vào CNN để dự đoán
+            y_pred = model(x)
+
+            # Tính độ lỗi giữa dự đoán và đáp án thật
+            loss = digitconvolution_Loss(y_pred, y)
+
+            # Tính gradient để biết cần điều chỉnh trọng số thế nào
+            loss.backward()
+
+            # Cập nhật trọng số của mô hình
+            optimizer.step()
