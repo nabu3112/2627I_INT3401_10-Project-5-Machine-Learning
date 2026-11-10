@@ -275,6 +275,7 @@ class Attention(Module):
 
         self.layer_size = layer_size
 
+
     def forward(self, input):
         """
         Applies the attention mechanism to input. All necessary layers have
@@ -289,6 +290,32 @@ class Attention(Module):
         Take a look at the "dim" argument of torch.nn.functional.softmax to figure out how to do this.
         """
         B, T, C = input.size()
+
+        # 1. Tao Query, Key, Value
+        Q = self.q_layer(input)
+        K = self.k_layer(input)
+        V = self.v_layer(input)
+
+        # 2. Tinh Q * K^T
+        scores = Q @ K.transpose(-2, -1)
+
+        # 3. Chia cho can bac hai layer_size
+        scores = scores / (self.layer_size ** 0.5)
+
+        # 4. Ap dung causal mask
+        scores = scores.masked_fill(
+            self.mask[:, :, :T, :T] == 0,
+            float("-inf")
+        )[0]
+
+        # 5. Softmax tren chieu cuoi
+        weights = scores.softmax(dim=-1)
+
+        # 6. Nhan voi Value
+        output = weights @ V
+
+        return output
+
 
         """YOUR CODE HERE"""
 
