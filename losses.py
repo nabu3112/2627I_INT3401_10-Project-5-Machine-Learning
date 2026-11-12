@@ -2,6 +2,7 @@ from torch.nn.functional import mse_loss, cross_entropy
 
 def regression_loss(prediction, target):
     return mse_loss(prediction, target)
+    
 
 
 
