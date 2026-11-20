@@ -168,6 +168,7 @@ def parse_options(argv):
     return options
 
 def main():
+    global PLOT_RUN_NUMBER
     options = parse_options(sys.argv)
     if options.check_dependencies:
         check_dependencies()
@@ -192,6 +193,8 @@ def main():
         else:
             questions = [options.grade_question]
             PREREQS[options.grade_question] = set()
+
+    PLOT_RUN_NUMBER = plot_utils.start_run()
 
     tracker = Tracker(questions, maxes, PREREQS, options.mute_output)
     for q in questions:
@@ -229,6 +232,9 @@ import contextlib
 from torch import nn, Tensor
 import torch
 import backend
+from plot_scripts import plot_utils
+
+PLOT_RUN_NUMBER = 0
 
 def check_dependencies():
     import matplotlib.pyplot as plt
@@ -386,7 +392,12 @@ def check_perceptron(tracker):
     model = models.PerceptronModel(3)
     dataset = backend.PerceptronDataset(model)
 
-    train.train_perceptron(model, dataset)
+    errors = train.train_perceptron(model, dataset)
+    plot_utils.save_curve(
+        "q1", PLOT_RUN_NUMBER, errors,
+        "Q1: Số lỗi Perceptron theo lượt", "Số mẫu phân loại sai",
+        threshold=0
+    )
     backend.maybe_sleep_and_close(1)
 
     assert dataset.epoch != 0, "Perceptron code never iterated over the training data"
@@ -427,7 +438,12 @@ def check_regression(tracker):
 
     tracker.add_points(2) # Partial credit for passing sanity checks
 
-    train.train_regression(model, dataset)
+    loss_history = train.train_regression(model, dataset)
+    plot_utils.save_curve(
+        "q2", PLOT_RUN_NUMBER, loss_history,
+        "Q2: MSE theo epoch", "MSE Loss",
+        threshold=0.02, log_scale=True
+    )
     backend.maybe_sleep_and_close(1)
 
     data_x = torch.tensor(dataset.x, dtype=torch.float32)
@@ -488,6 +504,11 @@ def check_digit_classification(tracker):
     tracker.add_points(2) # Partial credit for passing sanity checks
 
     train.train_digitclassifier(model, dataset)
+    plot_utils.save_curve(
+        "q3", PLOT_RUN_NUMBER, model._plot_loss_history,
+        "Q3: Cross Entropy theo epoch", "Cross Entropy Loss",
+        log_scale=True
+    )
 
 
     test_logits = model(torch.tensor(dataset.test_images)).data
@@ -543,6 +564,11 @@ def check_lang_id(tracker):
     tracker.add_points(2) # Partial credit for passing sanity checks
 
     train.train_languageid(model, dataset)
+    plot_utils.save_curve(
+        "q4", PLOT_RUN_NUMBER, model._plot_loss_history,
+        "Q4: Cross Entropy theo epoch", "Cross Entropy Loss",
+        log_scale=True
+    )
 
 
     accuracy_threshold = 0.81
@@ -594,6 +620,11 @@ def check_convolution(tracker):
     tracker.add_points(1) # Partial credit for testing whether convolution function works
 
     train.Train_DigitConvolution(model, dataset)
+    plot_utils.save_curve(
+        "q5", PLOT_RUN_NUMBER, model._plot_loss_history,
+        "Q5: Cross Entropy theo epoch", "Cross Entropy Loss",
+        log_scale=True
+    )
 
 
     test_logits = model(torch.tensor(dataset.test_images)).data

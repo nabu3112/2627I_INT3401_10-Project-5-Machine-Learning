@@ -69,6 +69,7 @@ def train_regression(model, dataset):
         lr=0.001
     )
 
+    loss_history = []
     for epoch in range(2000):
         model.train()
 
@@ -102,6 +103,7 @@ def train_regression(model, dataset):
                 total_samples += n
 
         average_loss = total_loss / total_samples
+        loss_history.append(average_loss)
 
         if epoch % 100 == 0:
             print(f"Epoch {epoch}: Loss = {average_loss:.6f}")
@@ -111,6 +113,7 @@ def train_regression(model, dataset):
             print("Training completed!")
             break
 
+    return loss_history
 
 
 """
@@ -126,8 +129,11 @@ def train_digitclassifier(model, dataset):
     
     dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
     optimizer = optim.Adam(model.parameters(), lr=0.001)
+    loss_history = []
 
     for _ in range(10):
+        epoch_loss = 0.0
+        epoch_samples = 0
         for batch in dataloader:
             x = batch["x"]
             y = batch["label"]
@@ -135,8 +141,14 @@ def train_digitclassifier(model, dataset):
             optimizer.zero_grad()
             y_pred = model(x)
             loss = digitclassifier_loss(y_pred, y)
+            epoch_loss += loss.item() * x.shape[0]
+            epoch_samples += x.shape[0]
             loss.backward()
             optimizer.step()
+
+        loss_history.append(epoch_loss / epoch_samples)
+
+    model._plot_loss_history = loss_history
 
 
 """
@@ -163,16 +175,25 @@ def train_languageid(model, dataset):
     # test 64 va 0.001
     loader = DataLoader(dataset, batch_size=64, shuffle=True)
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
+    loss_history = []
     
     for _ in range(15):
+        epoch_loss = 0.0
+        epoch_samples = 0
         for batch in loader:
             xs = movedim(batch["x"], 0, 1)
             y = batch["label"]
             
             optimizer.zero_grad()
             loss = languageid_loss(model(xs), y)
+            epoch_loss += loss.item() * y.shape[0]
+            epoch_samples += y.shape[0]
             loss.backward()
             optimizer.step()
+
+        loss_history.append(epoch_loss / epoch_samples)
+
+    model._plot_loss_history = loss_history
 
 
 """
@@ -199,9 +220,12 @@ def Train_DigitConvolution(model, dataset):
         model.parameters(),
         lr=0.001
     )
+    loss_history = []
 
     # Huấn luyện qua toàn bộ dữ liệu 10 lần
     for epoch in range(10):
+        epoch_loss = 0.0
+        epoch_samples = 0
 
         # Lấy lần lượt từng batch dữ liệu
         for batch in dataloader:
@@ -220,9 +244,15 @@ def Train_DigitConvolution(model, dataset):
 
             # Tính độ lỗi giữa dự đoán và đáp án thật
             loss = digitconvolution_Loss(y_pred, y)
+            epoch_loss += loss.item() * x.shape[0]
+            epoch_samples += x.shape[0]
 
             # Tính gradient để biết cần điều chỉnh trọng số thế nào
             loss.backward()
 
             # Cập nhật trọng số của mô hình
             optimizer.step()
+
+        loss_history.append(epoch_loss / epoch_samples)
+
+    model._plot_loss_history = loss_history

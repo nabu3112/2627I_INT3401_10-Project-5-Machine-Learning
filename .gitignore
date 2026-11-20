@@ -4,4 +4,7 @@ __pycache__/
 .venv312/
 __pycache__/
 *.pyc
+VERSION
+plots/
+
 
