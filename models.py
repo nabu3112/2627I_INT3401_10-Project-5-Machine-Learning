@@ -1,89 +1,72 @@
 from torch import stack, tril
 from torch.nn import Module
-
-
-"""
-Functions you should use.
-Please avoid importing any other functions or modules.
-Your code will not pass if the gradescope autograder detects any changed imports
-"""
-# import torch
 from torch.nn import Parameter, Linear
 from torch import tensor, tensordot, ones, matmul, zeros 
 from torch.nn.functional import relu, softmax
 from torch import movedim
+
 
 """
 ##################
 ### QUESTION 1 ###
 ##################
 """
-
-
 class PerceptronModel(Module):
-    def __init__(self, dimensions):
-        """
+    
+    """
         Initialize a new Perceptron instance.
-
+        
         A perceptron classifies data points as either belonging to a particular
         class (+1) or not (-1). `dimensions` is the dimensionality of the data.
         For example, dimensions=2 would mean that the perceptron must classify
         2D points.
-
+        
         In order for our autograder to detect your weight, initialize it as a
         pytorch Parameter object as follows:
-
-        Parameter(weight_vector)
-
-        where weight_vector is a pytorch Tensor of dimension 'dimensions'
-
-        Hint: You can use ones(dim) to create a tensor of dimension dim.
-        """
+        
+        Parameter(weight_vector) where weight_vector is a pytorch Tensor of dimension 'dimensions'
+    """
+    def __init__(self, dimensions):
         super(PerceptronModel, self).__init__()
-
-        "*** YOUR CODE HERE ***"
         self.w = Parameter(ones(1, dimensions))
 
 
-    def get_weights(self):
-        """
+    """
         Return a Parameter instance with the current weights of the perceptron.
-        """
+    """
+    def get_weights(self):
         return self.w
 
 
-    def forward(self, x):
-        """
+    """
         Calculates the score assigned by the perceptron to a data point x.
 
         Inputs:
             x: a node with shape (dimensions)
         Returns: a node containing a single number (the score)
-
-        The pytorch function `tensordot` may be helpful here.
-        """
-        "*** YOUR CODE HERE ***"
+    """
+    def forward(self, x):
         return matmul(x, self.w.t())
 
-        
 
-    def get_prediction(self, x):
-        """
+    """
         Calculates the predicted class for a single data point `x`.
 
         Returns: 1 or -1
-        """
+    """
+    def get_prediction(self, x):
         score = self(x)
-
         if score >= 0:
             return 1
         else:
             return -1
         
 
-
-
-
+"""
+##################
+### QUESTION 2 ###
+##################
+"""
 class RegressionModel(Module):
     """
     Neural network for approximating sin(x)
@@ -97,6 +80,15 @@ class RegressionModel(Module):
         self.layer2 = Linear(128, 128)
         self.layer3 = Linear(128, 1)
 
+
+    """
+        Runs the model for a batch of examples.
+
+        Inputs:
+            x: a node with shape (batch_size x 1)
+        Returns:
+            A node with shape (batch_size x 1) containing predicted y-values
+    """
     def forward(self, x):
         x = relu(self.layer1(x))
         x = relu(self.layer2(x))
@@ -105,8 +97,11 @@ class RegressionModel(Module):
         return x
   
 
-
-
+"""
+##################
+### QUESTION 3 ###
+##################
+"""
 class DigitClassificationModel(Module):
     """
     A model for handwritten digit classification using the MNIST dataset.
@@ -123,19 +118,16 @@ class DigitClassificationModel(Module):
     """
 
     def __init__(self):
-        # Initialize your model parameters here
         super().__init__()
         input_size = 28 * 28
         output_size = 10
-        "*** YOUR CODE HERE ***"
 
         self.fc1 = Linear(input_size, 256)
         self.fc2 = Linear(256, 128)
         self.fc3 = Linear(128, output_size)
 
 
-    def forward(self, x):
-        """
+    """
         Runs the model for a batch of examples.
 
         Your model should predict a node with shape (batch_size x 10),
@@ -147,13 +139,18 @@ class DigitClassificationModel(Module):
         Output:
             A node with shape (batch_size x 10) containing predicted scores
                 (also called logits)
-        """
-        """ YOUR CODE HERE """
+    """
+    def forward(self, x):
         x = relu(self.fc1(x))
         x = relu(self.fc2(x))
         return self.fc3(x)
 
 
+"""
+##################
+### QUESTION 4 ###
+##################
+"""
 class LanguageIDModel(Module):
     """
     A model for language identification at a single-word granularity.
@@ -164,10 +161,6 @@ class LanguageIDModel(Module):
     """
 
     def __init__(self):
-        # Our dataset contains words from five different languages, and the
-        # combined alphabets of the five languages contain a total of 47 unique
-        # characters.
-        # You can refer to self.num_chars or len(self.languages) in your code
         self.num_chars = 47
         self.languages = ["English", "Spanish", "Finnish", "Dutch", "Polish"]
         super(LanguageIDModel, self).__init__()
@@ -177,8 +170,7 @@ class LanguageIDModel(Module):
         self.classifier = Linear(hidden_size, len(self.languages))
 
 
-    def forward(self, xs):
-        """
+    """
         Runs the model for a batch of examples.
 
         Although words have different lengths, our data processing guarantees
@@ -205,9 +197,8 @@ class LanguageIDModel(Module):
         Returns:
             A node with shape (batch_size x 5) containing predicted scores
                 (also called logits)
-        """
-        "*** YOUR CODE HERE ***"
-
+    """
+    def forward(self, xs):
         h = relu(self.char_proj(xs[0]))
         for x_t in xs[1:]:
             proposed = relu(self.char_proj(x_t) + self.state_proj(h))
@@ -216,8 +207,7 @@ class LanguageIDModel(Module):
         return self.classifier(h)
 
 
-def Convolve(input: tensor, weight: tensor):
-    """
+"""
     Acts as a convolution layer by applying a 2d convolution with the given inputs and weights.
     DO NOT import any pytorch methods to directly do this, the convolution must be done with only the functions
     already imported.
@@ -231,12 +221,14 @@ def Convolve(input: tensor, weight: tensor):
 
     The method 'zeros((y_dim,x_dim))' may also be useful. It initializes a pytorch tensor with dimensions (y_dim, x_dim), with every value
     set to zero.
-    """
+"""
+def Convolve(input: tensor, weight: tensor):
+    
     input_tensor_dimensions = input.shape
     weight_dimensions = weight.shape
     Output_Tensor = tensor(())
-    "*** YOUR CODE HERE ***"
-        # Lấy kích thước của ảnh đầu vào
+    
+    # Lấy kích thước của ảnh đầu vào
     input_height = input.shape[0]  # Số hàng của ảnh
     input_width = input.shape[1]   # Số cột của ảnh
 
@@ -271,10 +263,14 @@ def Convolve(input: tensor, weight: tensor):
             # Ghi kết quả vào vị trí tương ứng của ảnh đầu ra
             Output_Tensor[y, x] = value
 
-    "*** End Code ***"
     return Output_Tensor
 
 
+"""
+##################
+### QUESTION 5 ###
+##################
+"""
 class DigitConvolutionalModel(Module):
     """
     A model for handwritten digit classification using the MNIST dataset.
@@ -288,7 +284,6 @@ class DigitConvolutionalModel(Module):
     """
 
     def __init__(self):
-        # Initialize your model parameters here
         super().__init__()
         output_size = 10
 
@@ -306,19 +301,18 @@ class DigitConvolutionalModel(Module):
         # Lớp đầu ra có 10 neuron tương ứng với 10 chữ số 0-9
         self.output_layer = Linear(64, output_size)
 
-
-
-    def forward(self, x):
-        """
+    """
         The convolutional layer is already applied, and the output is flattened for you. You should treat x as
         a regular 1-dimensional datapoint now, similar to the previous questions.
-        """
+    """
+    def forward(self, x):
+
         x = x.reshape(len(x), 28, 28)
         x = stack(
             list(map(lambda sample: Convolve(sample, self.convolution_weights), x))
         )
         x = x.flatten(start_dim=1)
-        """ YOUR CODE HERE """
+        
         # Đưa dữ liệu qua lớp Linear thứ nhất
         # ReLU giúp mô hình học được các quan hệ phi tuyến
         x = relu(self.layer1(x))
@@ -335,16 +329,21 @@ class DigitConvolutionalModel(Module):
         return x
 
 
-
+"""
+##################
+### QUESTION 6 ###
+##################
+"""
 class Attention(Module):
-    def __init__(self, layer_size, block_size):
-        super().__init__()
-        """
+    """
         All the layers you should use are defined here.
-
+    
         In order to pass the autograder, make sure each linear layer matches up with their corresponding matrix,
         ie: use self.k_layer to generate the K matrix.
-        """
+    """
+    def __init__(self, layer_size, block_size):
+        super().__init__()
+        
         self.k_layer = Linear(layer_size, layer_size)
         self.q_layer = Linear(layer_size, layer_size)
         self.v_layer = Linear(layer_size, layer_size)
@@ -357,9 +356,7 @@ class Attention(Module):
 
         self.layer_size = layer_size
 
-
-    def forward(self, input):
-        """
+    """
         Applies the attention mechanism to input. All necessary layers have
         been defined in __init__()
 
@@ -370,7 +367,9 @@ class Attention(Module):
 
         For the softmax activation, it should be applied to the last dimension of the input,
         Take a look at the "dim" argument of torch.nn.functional.softmax to figure out how to do this.
-        """
+    """
+    def forward(self, input):
+        
         B, T, C = input.size()
 
         # 1. Tao Query, Key, Value
@@ -397,7 +396,4 @@ class Attention(Module):
         output = weights @ V
 
         return output
-
-
-        """YOUR CODE HERE"""
 

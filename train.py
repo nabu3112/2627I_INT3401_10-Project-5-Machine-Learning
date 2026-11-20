@@ -17,8 +17,6 @@ from torch import movedim
 ### QUESTION 1 ###
 ##################
 """
-
-
 def train_perceptron(model, dataset):
     """
     Train the perceptron until convergence.
@@ -30,7 +28,8 @@ def train_perceptron(model, dataset):
     """
     with no_grad():
         dataloader = DataLoader(dataset, batch_size=1, shuffle=True)
-        "*** YOUR CODE HERE ***"
+        errors_per_epoch = []
+
         while True:
             mistakes = 0
 
@@ -42,28 +41,33 @@ def train_perceptron(model, dataset):
                     model.w += y * x
                     mistakes += 1
 
+            errors_per_epoch.append(mistakes)
+
             if mistakes == 0:
                 break
 
+        return errors_per_epoch
 
 
+"""
+##################
+### QUESTION 2 ###
+##################
+"""
 def train_regression(model, dataset):
     """
     Train model to approximate sin(x).
     """
-
     dataloader = DataLoader(
         dataset,
         batch_size=50,
         shuffle=True
     )
 
-    
     optimizer = optim.Adam(
         model.parameters(),
         lr=0.001
     )
-
 
     for epoch in range(2000):
         model.train()
@@ -109,14 +113,17 @@ def train_regression(model, dataset):
 
 
 
+"""
+##################
+### QUESTION 3 ###
+##################
+"""
 def train_digitclassifier(model, dataset):
     """
     Trains the model.
     """
     model.train()
-    """ YOUR CODE HERE """
-
-    model.train()
+    
     dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
     optimizer = optim.Adam(model.parameters(), lr=0.001)
 
@@ -131,6 +138,12 @@ def train_digitclassifier(model, dataset):
             loss.backward()
             optimizer.step()
 
+
+"""
+##################
+### QUESTION 4 ###
+##################
+"""
 def train_languageid(model, dataset):
     """
     Trains the model.
@@ -146,7 +159,6 @@ def train_languageid(model, dataset):
     For more information, look at the pytorch documentation of torch.movedim()
     """
     model.train()
-    "*** YOUR CODE HERE ***"
 
     # test 64 va 0.001
     loader = DataLoader(dataset, batch_size=64, shuffle=True)
@@ -163,11 +175,15 @@ def train_languageid(model, dataset):
             optimizer.step()
 
 
+"""
+##################
+### QUESTION 5 ###
+##################
+"""
 def Train_DigitConvolution(model, dataset):
     """
     Trains the model.
     """
-    """ YOUR CODE HERE """
     # Đưa mô hình vào chế độ training
     model.train()
 
