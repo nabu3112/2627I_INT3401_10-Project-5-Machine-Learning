@@ -37,7 +37,6 @@ Other support files may be present in the repository and are used by the project
 - Matplotlib
 - SciPy
 - scikit-learn
-- Jupyter and ipykernel (useful for the development environment)
 
 ## Setup
 
