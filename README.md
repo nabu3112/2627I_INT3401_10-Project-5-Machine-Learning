@@ -26,6 +26,7 @@ Our submission covers **Questions 1–6**. **Question 7 (Character GPT) is outsi
 | `backend.py` | Dataset loading and supporting project code. |
 | `autograder.py` | Runs the question-specific checks. |
 | `data/` | Project datasets, if included in the checkout. |
+| `plot_scripts/` | Plot generation utilities for training results |
 
 Other support files may be present in the repository and are used by the project infrastructure.
 
